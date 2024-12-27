@@ -1,9 +1,18 @@
 ---
-import Layout from '../layouts/Layout.astro'
+import Layout from '@/layouts/Layout.astro'
+import Countdown from '@/sections/Countdown.astro'
+import Footer from '@/sections/Footer.astro'
+import PrincipalDate from '@/sections/PrincipalDate.astro'
+import Info from '@/sections/Info.astro'
+import Hero from '@/sections/Hero.astro'
 ---
 
 <Layout title='La Velada IV'>
+	<Hero />
 	<main>
-		<h1>La Velada IV</h1>
+		<PrincipalDate />
+		<Info />
+		<Countdown />
 	</main>
+	<Footer />
 </Layout>
