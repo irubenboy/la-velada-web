@@ -66,10 +66,14 @@ const { title, description } = Astro.props
 		--color-twitch: #9146ff;
 		--color-twitch-ice: #f0f0ff;
 
-		--background-color: #222;
+		--background-color: #101010;
 		--background-twitch: var(--color-twitch-ice);
 	}
 
+	@font-face{
+		font-family: Atomic;
+		src: url('/fonts/atomic.woff2') format("woff2");
+	}
 	html {
 		font-family: "Jost Variable", system-ui, sans-serif;
 		background: var(--background-color);
