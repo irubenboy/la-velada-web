@@ -6,10 +6,15 @@ export default {
 	theme: {
 		extend: {
 			colors: {
-				'primary': '#333',
-				'secondary': '#ddd',
+				'primary': 'var(--color-primary)',
+				'secondary': 'var(--color-secondary)',
+				'twitch': 'var(--color-twitch)',
+				'ice': 'var(--color-twitch-ice)'
 			}
 		},
 	},
-	plugins: [animations],
+	darkMode: 'class',
+	plugins: [animations, function({ addVariant }) {
+		addVariant("any-hover", "@media (any-hover: hover) { &:hover }")
+	}],
 }

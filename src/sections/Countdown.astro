@@ -1,86 +1,158 @@
 ---
-import LaVeladaLogo from '@/icons/la-velada.astro'
-
-const TIMESTAMP_END = 1741114800000
+import LaVeladaLogo from "@/icons/la-velada.astro"
+import Date from "@/components/Date.astro"
+import { EVENT_TIMESTAMP } from "@/consts/event-date"
 ---
-<section class="my-32 flex flex-col gap-y-10 justify-center items-center">
-    <LaVeladaLogo class="text-primary"/>
 
-    <div class="flex flex-row gap-x-2 text-primary uppercase font-semibold" data-date={TIMESTAMP_END}>
-        <div class="flex flex-col justify-center items-center gap-y-2 w-16">
-            <span class="text-4xl tabular-nums" data-days>00</span>
-            <span class="text-xs text-center">Días</span>
-        </div>
+<section class="my-0 flex flex-col place-items-center gap-y-10 lg:my-32" aria-label="cuenta atrás">
+	<LaVeladaLogo class="text-primary" />
+	<p
+		class="countdown-text max-w-[250px] text-balance text-center text-lg font-medium uppercase text-primary opacity-80 sm:max-w-full"
+	>
+		Para el Evento de Presentación faltan
+	</p>
 
-        <span aria-hidden class="mt-1 font-bold text-xl">:</span>
+	<div
+		class="flex flex-row gap-x-1 font-semibold uppercase text-primary"
+		data-date={EVENT_TIMESTAMP}
+		role="timer"
+	>
+		<Date dateType="Días" attribute={{ "data-days": "" }} max={99} />
 
-        <div class="flex flex-col justify-center items-center gap-y-2 w-16">
-            <span class="text-4xl tabular-nums" data-hours>00</span>
-            <span class="text-xs text-center">Horas</span>
-        </div>
+		<span aria-hidden="true" class="mt-1 text-xl">:</span>
 
-        <span aria-hidden class="mt-1 font-bold text-xl">:</span>
+		<Date dateType="Horas" attribute={{ "data-hours": "" }} max={23} />
 
-        <div class="flex flex-col justify-center items-center gap-y-2 w-16">
-            <span class="text-4xl tabular-nums" data-minutes>00</span>
-            <span class="text-xs text-center">Minutos</span>
-        </div>
+		<span aria-hidden="true" class="mt-1 text-xl">:</span>
 
-        <span aria-hidden class="mt-1 font-bold text-xl">:</span>
+		<Date dateType="Minutos" attribute={{ "data-minutes": "" }} max={59} />
 
-        <div class="flex flex-col justify-center items-center gap-y-2 w-16">
-            <span class="text-4xl tabular-nums" data-seconds>00</span>
-            <span class="text-xs text-center">Segundos</span>
-        </div>
-    </div>
+		<span aria-hidden="true" class="mt-1 text-xl">:</span>
+
+		<Date dateType="Segundos" attribute={{ "data-seconds": "" }} max={59} />
+	</div>
 </section>
 
 <script>
-    const SECOND = 1000
-    const MINUTE = SECOND * 60
-    const HOUR = MINUTE * 60
-    const DAY = HOUR * 24
+	const SECOND = 1000
+	const MINUTE = SECOND * 60
+	const HOUR = MINUTE * 60
+	const DAY = HOUR * 24
 
-    function init(){
-        const $countdown = document.querySelector('[data-date]')
-        if(!$countdown) return
+	function init() {
+		const $countdown = document.querySelector("[data-date]")
+		if (!$countdown) return
 
-        const $days = $countdown.querySelector('[data-days]')
-        const $hours = $countdown.querySelector('[data-hours]')
-        const $minutes = $countdown.querySelector('[data-minutes]')
-        const $seconds = $countdown.querySelector('[data-seconds]')
-    
-        const timestamp = $countdown.getAttribute('data-date')
-        if(!timestamp) return
+		let intervalId: number
 
-        const date = new Date(+timestamp).getTime()
+		const $days = {
+			firstDigit: $countdown.querySelector("[data-days] [data-first-group]"),
+			secondDigit: $countdown.querySelector("[data-days] [data-second-group]"),
+		}
 
-        const format = (time: number) => Math.floor(time).toString().padStart(2, '0')
+		const $hours = {
+			firstDigit: $countdown.querySelector("[data-hours] [data-first-group]"),
+			secondDigit: $countdown.querySelector("[data-hours] [data-second-group]"),
+		}
 
-        function updateCountdown(){
-            const now = Date.now()
-            const diff = date - now
+		const $minutes = {
+			firstDigit: $countdown.querySelector("[data-minutes] [data-first-group]"),
+			secondDigit: $countdown.querySelector("[data-minutes] [data-second-group]"),
+		}
 
-            if($days instanceof HTMLElement){
-                $days.innerText = format(diff / DAY)
-            }
+		const $seconds = {
+			firstDigit: $countdown.querySelector("[data-seconds] [data-first-group]"),
+			secondDigit: $countdown.querySelector("[data-seconds] [data-second-group]"),
+		}
 
-            if($hours instanceof HTMLElement){
-                $hours.innerText = format(diff % DAY / HOUR)
-            }
+		const timestamp = $countdown.getAttribute("data-date")
+		if (!timestamp) return
 
-            if($minutes instanceof HTMLElement){
-                $minutes.innerText = format(diff % HOUR / MINUTE)
-            }
+		const date = new Date(+timestamp).getTime()
 
-            if($seconds instanceof HTMLElement){
-                $seconds.innerText = format(diff % MINUTE / SECOND)
-            }
+		const formatTime = (time: number) => {
+			return Math.floor(time).toString().padStart(2, "0")
+		}
 
-        }
-        setInterval((updateCountdown), SECOND)
-    }
+		function animateDigit(group: HTMLElement, value: string) {
+			const wrapper = group.querySelector("[data-wrapper]")
+			const num = group.querySelector(`[data-num="${value}"]`)
+			const xnum = group.querySelector("[data-num-x0]") // 0 añadido para la animación
 
-    init()
+			if (
+				wrapper instanceof HTMLElement &&
+				num instanceof HTMLElement &&
+				xnum instanceof HTMLElement
+			) {
+				wrapper.style.transform = `translateY(-${num.offsetTop}px)`
 
+				// Cuando cambie, volver arriba
+				if (value === "0") {
+					setTimeout(() => {
+						wrapper.classList.toggle("duration-[800ms]", false)
+						wrapper.classList.toggle("transition-transform", false)
+						wrapper.style.transform = `translateY(-${xnum.offsetTop}px)`
+					}, 800)
+				} else {
+					wrapper.classList.toggle("duration-[800ms]", true)
+					wrapper.classList.toggle("transition-transform", true)
+				}
+			}
+		}
+
+		function updateCountdown() {
+			const now = Date.now()
+			const diff = date - now
+			const $countdown = document.querySelector("[data-date]")
+			if (!$countdown) return
+
+			const days = formatTime(diff / DAY)
+			const hours = formatTime((diff % DAY) / HOUR)
+			const minutes = formatTime((diff % HOUR) / MINUTE)
+			const seconds = formatTime((diff % MINUTE) / SECOND)
+
+			if ($days.firstDigit instanceof HTMLElement && $days.secondDigit instanceof HTMLElement) {
+				animateDigit($days.firstDigit, days[0])
+				animateDigit($days.secondDigit, days[1])
+			}
+
+			if ($hours.firstDigit instanceof HTMLElement && $hours.secondDigit instanceof HTMLElement) {
+				animateDigit($hours.firstDigit, hours[0])
+				animateDigit($hours.secondDigit, hours[1])
+			}
+
+			if (
+				$minutes.firstDigit instanceof HTMLElement &&
+				$minutes.secondDigit instanceof HTMLElement
+			) {
+				animateDigit($minutes.firstDigit, minutes[0])
+				animateDigit($minutes.secondDigit, minutes[1])
+			}
+
+			if (
+				$seconds.firstDigit instanceof HTMLElement &&
+				$seconds.secondDigit instanceof HTMLElement
+			) {
+				animateDigit($seconds.firstDigit, seconds[0])
+				animateDigit($seconds.secondDigit, seconds[1])
+			}
+
+			if (diff < 1000) {
+				clearInterval(intervalId)
+				document.querySelector(".countdown-text")?.remove()
+
+				$countdown.innerHTML = "¡El evento de presentación ha empezado! 🎉"
+				$countdown.className = "text-primary uppercase font-semibold animate-fade-in text-3xl"
+
+				import("canvas-confetti").then(({ default: confetti }) => {
+					confetti()
+				})
+			}
+		}
+
+		intervalId = setInterval(updateCountdown, SECOND)
+		updateCountdown()
+	}
+
+	init()
 </script>
