@@ -4,25 +4,26 @@ import MapMarkerIcon from "@/icons/map-marker.astro"
 ---
 
 <section
-	class="mx-auto mt-16 flex animate-fade-in flex-col place-items-center text-center text-primary animate-delay-[2s] motion-reduce:animate-delay-[0s] motion-reduce:animate-duration-[0s] md:mt-32"
+	class="mx-auto mt-16 flex animate-fade-in flex-col place-items-center text-center text-primary animate-delay-300 motion-reduce:animate-delay-[0s] motion-reduce:animate-duration-[0s] md:mt-32"
 >
 	<div class="text-3xl font-semibold uppercase md:text-5xl">
 		<time class="date"></time>
-		<span aria-hidden="true" class="mx-1 hidden md:inline">·</span>
-		<br aria-hidden="true" class="block md:hidden" />
+		<span class="date-time-separator hidden">
+			<span aria-hidden="true" class="mx-1 hidden md:inline">·</span>
+			<br aria-hidden="true" class="block md:hidden" />
+		</span>
 		<time class="time"></time>
 	</div>
 
 	<h2 class="mt-6 flex max-w-sm flex-col text-lg font-medium uppercase lg:text-2xl">
-		<span>Evento de Presentación</span>
 		<a
-			href="https://maps.app.goo.gl/RFzHUVDhRqdQaTAo8"
+			class="flex"
+			href="https://maps.app.goo.gl/HNXeC3x1r183UqUB8"
 			target="_blank"
 			rel="noopener"
-			style="display: -webkit-box;"
-			aria-label="ubicación del teatro en google maps, se abrirá en una nueva pestaña"
+			aria-label="ubicación del estadio Santiago Bernabéu en google maps, se abrirá en una nueva pestaña"
 		>
-			<MapMarkerIcon class="mr-1 max-md:mt-1 md:mt-0.5 md:size-6" /> Teatro Victoria (Barcelona)
+			<MapMarkerIcon class="mr-1 max-md:mt-1 md:mt-0.5 md:size-6" /> Estadio Santiago Bernabéu
 		</a>
 	</h2>
 
@@ -156,15 +157,24 @@ import MapMarkerIcon from "@/icons/map-marker.astro"
 		return new Intl.DateTimeFormat("en-CA", options).format(new Date(timestamp))
 	}
 
-	function updateUI(dateString: string, timeString: string, validDatetime: string) {
+	function updateUI(dateString: string, timeString: string, validDatetime: string, {
+		showTime = true
+	}: {
+		showTime?: boolean
+	}) {
 		const $dateSpan = document.querySelector(".date")
 		const $timeSpan = document.querySelector(".time")
+		const $dateSeparator = document.querySelector(".date-time-separator")
 
-		if ($dateSpan != null && $timeSpan != null) {
+		if ($dateSpan != null) {
 			$dateSpan.innerHTML = dateString
 			$dateSpan.setAttribute("datetime", validDatetime)
+		}
+
+		if ($timeSpan != null && showTime) {
 			$timeSpan.innerHTML = timeString
 			$timeSpan.setAttribute("datetime", validDatetime)
+			$dateSeparator?.classList.remove("hidden")
 		}
 	}
 
@@ -174,7 +184,7 @@ import MapMarkerIcon from "@/icons/map-marker.astro"
 		const formattedTime = formatEventTimeWithTimeZoneName(EVENT_TIMESTAMP, USER_TZ)
 		const validDatetime = formatValidDatetime(EVENT_TIMESTAMP, USER_TZ)
 
-		updateUI(formattedDate, formattedTime, validDatetime)
+		updateUI(formattedDate, formattedTime, validDatetime, { showTime: false })
 	}
 
 	document.addEventListener("DOMContentLoaded", main)
